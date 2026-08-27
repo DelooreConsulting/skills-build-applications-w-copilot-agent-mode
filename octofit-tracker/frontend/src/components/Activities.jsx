@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 import { displayName, fetchCollection, formatDate } from './api.js'
 
+const activitiesEndpoint = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/activities/`
+  : 'http://localhost:8000/api/activities/'
+
 function Activities() {
   const [activities, setActivities] = useState([])
   const [error, setError] = useState('')
-  useEffect(() => { fetchCollection('activities').then(setActivities).catch((loadError) => setError(loadError.message)) }, [])
+  useEffect(() => { fetchCollection('activities', activitiesEndpoint).then(setActivities).catch((loadError) => setError(loadError.message)) }, [])
   return <DataTable title="Activity log" subtitle="Every session adds up." error={error}><table className="table align-middle"><thead><tr><th>Athlete</th><th>Activity</th><th>Duration</th><th>Calories</th><th>Date</th></tr></thead><tbody>{activities.map((activity) => <tr key={activity._id}><td>{displayName(activity.user)}</td><td>{activity.type}</td><td>{activity.duration} min</td><td>{activity.calories}</td><td>{formatDate(activity.date)}</td></tr>)}</tbody></table></DataTable>
 }
 
